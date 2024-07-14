@@ -17,9 +17,6 @@
 
 #include <dmx.h>
 
-#define DEBUG_PIN_6 19
-#define DEBUG_PIN_7 18
-
 namespace dmxserial
 {
 
@@ -40,8 +37,6 @@ namespace dmxserial
 
     void DMX::Initialize()
     {
-        pinMode(DEBUG_LED, OUTPUT);
-        digitalWrite(DEBUG_LED, 0);
         // configure UART for DMX
         uart_config_t uart_config =
             {
@@ -211,20 +206,19 @@ namespace dmxserial
         return framecount;
     }
 
-    void DMX::enableOutput(bool enable)
+    void DMX::setOutput(bool enable)
     {
-        /*
+        
         if (uart_send_task_h == NULL)
         {
             return;
         }
         eTaskState state = eTaskGetState(uart_send_task_h);
-        */
 #ifndef DMXSERIAL_IGNORE_THREADSAFETY
         xSemaphoreTake(sync_serial_dmx, portMAX_DELAY);
 #endif
         enableoutput = enable;
-        /*
+        
         if (enableoutput && (state == eSuspended))
         {
             vTaskResume(uart_send_task_h);
@@ -233,7 +227,6 @@ namespace dmxserial
         {
             vTaskSuspend(uart_send_task_h);
         }
-        */
 #ifndef DMXSERIAL_IGNORE_THREADSAFETY
         xSemaphoreGive(sync_serial_dmx);
 #endif
@@ -275,7 +268,7 @@ namespace dmxserial
 
     void DMX::uart_send_task(void *pvParameters)
     {
-        enableOutput(false);
+        setOutput(false);
         uint8_t start_code = 0x00;
         bool running = false;
         for (;;)
@@ -317,7 +310,6 @@ namespace dmxserial
                 // digitalWrite(DEBUG_LED, 1);
                 delay(1);
             }
-            digitalWrite(DEBUG_LED, !digitalRead(DEBUG_LED));
         }
     }
 
@@ -340,7 +332,6 @@ namespace dmxserial
                     // check if break detected
                     if (dmx_state == DMX_BREAK)
                     {
-                        digitalWrite(DEBUG_LED, !digitalRead(DEBUG_LED));
                         // if not 0, then RDM or custom protocol
                         if (dtmp[0] == 0)
                         {

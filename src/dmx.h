@@ -44,8 +44,6 @@
 #ifndef DMX_h
 #define DMX_h
 
-#define DEBUG_LED 2
-
 namespace dmxserial
 {
 
@@ -77,21 +75,24 @@ namespace dmxserial
 
         static uint8_t IsHealthy(); // returns true, when a valid DMX signal was received within the last 500ms
 
-        static bool getNewData();
+        static bool getNewData(); // returns true, when new data have been recieved and is avaliable - this function will reset the flag
 
-        static unsigned long getLastUpdateTime();
-        static unsigned long getFramecount();
-        static void resetFramecount();
-        void setComdir(DMXDirection direction);
+        static unsigned long getLastUpdateTime(); // retuns last dmx update time in ms
 
-        static void enableOutput(bool enable);
+        static unsigned long getFramecount(); // returns global dmx frame count
+
+        static void resetFramecount(); // resets global framecount
+
+        void setComdir(DMXDirection direction); // set transmition direction
+
+        static void setOutput(bool enable); // enable outbut if transmition direction is set to output
 
     private:
         DMX(); // hide constructor
 
-        static bool newdataflag;
+        static bool newdataflag; // new data avaliable flag
 
-        static bool enableoutput;
+        static bool enableoutput; // enable output direction
 
         static QueueHandle_t dmx_rx_queue; // queue for uart rx events
 
@@ -102,7 +103,7 @@ namespace dmxserial
         static uint16_t current_rx_addr; // last received dmx channel
 
         static long last_dmx_packet; // timestamp for the last received packet
-        static long last_dmx_packet_time;
+        static long last_dmx_packet_time; 
         static unsigned long _dmxserialFramecount;
 
         static uint8_t dmx_data[513]; // stores the received dmx data
