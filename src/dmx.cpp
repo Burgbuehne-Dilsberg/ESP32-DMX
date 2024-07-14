@@ -208,25 +208,10 @@ namespace dmxserial
 
     void DMX::setOutput(bool enable)
     {
-        
-        if (uart_send_task_h == NULL)
-        {
-            return;
-        }
-        eTaskState state = eTaskGetState(uart_send_task_h);
 #ifndef DMXSERIAL_IGNORE_THREADSAFETY
         xSemaphoreTake(sync_serial_dmx, portMAX_DELAY);
 #endif
         enableoutput = enable;
-        
-        if (enableoutput && (state == eSuspended))
-        {
-            vTaskResume(uart_send_task_h);
-        }
-        if(!enableoutput && (state != eSuspended))
-        {
-            vTaskSuspend(uart_send_task_h);
-        }
 #ifndef DMXSERIAL_IGNORE_THREADSAFETY
         xSemaphoreGive(sync_serial_dmx);
 #endif
@@ -283,7 +268,6 @@ namespace dmxserial
 #endif
             if (running) // enableoutput)
             {
-                // digitalWrite(DEBUG_PIN_6,!digitalRead(DEBUG_PIN_6));
                 //  wait till uart is ready
                 uart_wait_tx_done(DMX_UART_NUM, 1000);
                 // set line to inverse, creates break signal
@@ -307,7 +291,6 @@ namespace dmxserial
             }
             else
             {
-                // digitalWrite(DEBUG_LED, 1);
                 delay(1);
             }
         }
